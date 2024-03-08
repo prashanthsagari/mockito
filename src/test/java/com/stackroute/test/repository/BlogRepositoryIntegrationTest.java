@@ -1,27 +1,29 @@
 package com.stackroute.test.repository;
 
-import com.stackroute.domain.Blog;
-import com.stackroute.exception.BlogAlreadyExistsException;
-import com.stackroute.exception.BlogNotFoundException;
-import com.stackroute.repository.BlogRepository;
-import com.stackroute.service.BlogServiceImpl;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import com.stackroute.domain.Blog;
+import com.stackroute.exception.BlogAlreadyExistsException;
+import com.stackroute.exception.BlogNotFoundException;
+import com.stackroute.repository.BlogRepository;
+import com.stackroute.service.BlogServiceImpl;
 
 
 @SpringBootTest
@@ -57,17 +59,17 @@ class BlogRepositoryIntegrationTest {
      */
     @Test
     public void givenBlogToSaveThenShouldReturnSavedBlog() {
-    	Mockito.when(blogRepository.save(any(Blog.class))).thenReturn(blog);
+    	when(blogRepository.save(any(Blog.class))).thenReturn(blog);
     	assertEquals(blog,blogService.saveBlog(blog));
-    	Mockito.verify(blogRepository).save(blog);
+    	verify(blogRepository).save(blog);
     }
     
     @Test
     public void givenBlogToSaveThenShouldReturnExist() {
-    	Mockito.when(blogRepository.existsById(1)).thenThrow(new BlogAlreadyExistsException("Blog with ID 1 already exists."));
+    	when(blogRepository.existsById(1)).thenThrow(new BlogAlreadyExistsException("Blog with ID 1 already exists."));
     	BlogAlreadyExistsException exception = assertThrows(BlogAlreadyExistsException.class, () -> {blogService.saveBlog(blog);});
     	assertEquals("Blog with ID 1 already exists.", exception.getMessage());
-    	Mockito.verify(blogRepository).existsById(1);
+    	verify(blogRepository).existsById(1);
     }
 
 
@@ -76,9 +78,9 @@ class BlogRepositoryIntegrationTest {
      */
     @Test
     public void givenGetAllBlogsThenShouldReturnListOfAllBlogs() {
-    	Mockito.when(blogRepository.findAll()).thenReturn(blogList);
+    	when(blogRepository.findAll()).thenReturn(blogList);
     	assertEquals(blogList,blogService.getAllBlogs());
-    	Mockito.verify(blogRepository).findAll();
+    	verify(blogRepository).findAll();
     }
 
     /*
@@ -86,7 +88,7 @@ class BlogRepositoryIntegrationTest {
      */
     @Test
     public void givenBlogIdThenShouldReturnRespectiveBlog() {
-    	Mockito.when(blogRepository.findById(1)).thenReturn(Optional.of(blog));
+    	when(blogRepository.findById(1)).thenReturn(Optional.of(blog));
     	assertEquals(blog,blogService.getBlogById(1));
     	Mockito.verify(blogRepository).findById(1);
     	
@@ -95,10 +97,10 @@ class BlogRepositoryIntegrationTest {
     
     @Test
     public void givenBlogIdThenShouldReturnException() {
-    	Mockito.when(blogRepository.findById(1)).thenReturn(Optional.ofNullable(null));
+    	when(blogRepository.findById(1)).thenReturn(Optional.ofNullable(null));
     	BlogNotFoundException exception = assertThrows(BlogNotFoundException.class, () -> {blogService.getBlogById(1);});
     	assertEquals("Blog not found with ID 1", exception.getMessage());
-    	Mockito.verify(blogRepository).findById(1);
+    	verify(blogRepository).findById(1);
     	
     }
 
@@ -107,38 +109,38 @@ class BlogRepositoryIntegrationTest {
      */
     @Test
     public void givenBlogIdToDeleteThenShouldReturnDeletedBlog() {
-    	Mockito.when(blogRepository.findById(1)).thenReturn(Optional.of(blog));
-    	Mockito.doNothing().when(blogRepository).deleteById(1);
+    	when(blogRepository.findById(1)).thenReturn(Optional.of(blog));
+    	doNothing().when(blogRepository).deleteById(1);
     	assertEquals(blog,blogService.deleteBlog(1));
-    	Mockito.verify(blogRepository).findById(1);
-    	Mockito.verify(blogRepository).deleteById(1);
+    	verify(blogRepository).findById(1);
+    	verify(blogRepository).deleteById(1);
     }
     
     @Test
     public void givenBlogIdToDeleteThenShouldReturnException() {
-    	Mockito.when(blogRepository.findById(1)).thenReturn(Optional.ofNullable(null));
+    	when(blogRepository.findById(1)).thenReturn(Optional.ofNullable(null));
     	BlogNotFoundException exception = assertThrows(BlogNotFoundException.class, () -> {blogService.deleteBlog(1);});
     	assertEquals("Blog not found with ID 1", exception.getMessage());
-    	Mockito.verify(blogRepository).findById(1);
+    	verify(blogRepository).findById(1);
     }
     
     
     @Test
     public void testUpdateBlog() {
-    	Mockito.when(blogRepository.findById(1)).thenReturn(Optional.of(blog));
-    	Mockito.when(blogRepository.save(blog)).thenReturn(blog);
+    	when(blogRepository.findById(1)).thenReturn(Optional.of(blog));
+    	when(blogRepository.save(blog)).thenReturn(blog);
     	assertEquals(blog,blogService.updateBlog(blog));
-    	Mockito.verify(blogRepository).findById(1);
-    	Mockito.verify(blogRepository).save(blog);
+    	verify(blogRepository).findById(1);
+    	verify(blogRepository).save(blog);
     }
     
     
     @Test
     public void testUpdateBlogExcetion() {
-    	Mockito.when(blogRepository.findById(1)).thenReturn(Optional.ofNullable(null));
+    	when(blogRepository.findById(1)).thenReturn(Optional.ofNullable(null));
     	BlogNotFoundException exception = assertThrows(BlogNotFoundException.class, () -> {blogService.updateBlog(blog);});
     	assertEquals("Blog not found with ID 1", exception.getMessage());
-    	Mockito.verify(blogRepository).findById(1);
+    	verify(blogRepository).findById(1);
     }
 
 }
